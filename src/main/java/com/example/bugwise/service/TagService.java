@@ -32,6 +32,9 @@ public class TagService {
     }
     @Transactional
     public void deleteTag(Long id){
+    if (!tagRepository.existsById(id)){
+        throw new EntityNotFoundException("insect with id " + id + " not found");
+    }
         tagRepository.deleteById(id);
     }
     private TagDTO mapToDTO(Tag tag ){

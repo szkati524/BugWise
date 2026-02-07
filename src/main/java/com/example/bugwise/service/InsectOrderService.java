@@ -31,6 +31,9 @@ private final InsectOrderRepository insectOrderRepository;
     }
     @Transactional
     public void deleteInsectOrder(Long id){
+    if (!insectOrderRepository.existsById(id)){
+        throw new EntityNotFoundException("insect with id " + id + " not found");
+    }
     insectOrderRepository.deleteById(id);
     }
     @Transactional

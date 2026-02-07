@@ -54,6 +54,9 @@ return mapToDTO(updatedInsect);
     }
     @Transactional
     public void deleteInsect(Long id){
+        if (!insectRepository.existsById(id)) {
+            throw new EntityNotFoundException("insect with id " + id + " not found");
+        }
         insectRepository.deleteById(id);
     }
     private InsectDTO mapToDTO(Insect insect){

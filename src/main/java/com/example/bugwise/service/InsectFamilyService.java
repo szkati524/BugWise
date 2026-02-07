@@ -41,6 +41,9 @@ public class InsectFamilyService {
     }
     @Transactional
     public void deleteInsectFamily(Long id){
+        if (!insectFamilyRepository.existsById(id)){
+            throw new EntityNotFoundException("insect with id " + id + " not found");
+        }
         insectFamilyRepository.deleteById(id);
     }
         private InsectFamilyDTO mapToDTO(InsectFamily insectFamily){

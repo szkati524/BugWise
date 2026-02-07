@@ -41,6 +41,9 @@ public class HabitatService {
     }
     @Transactional
     public void deleteHabitat(Long id){
+    if (!habitatRepository.existsById(id)){
+        throw new EntityNotFoundException("insect with id " + id + " not found");
+    }
     habitatRepository.deleteById(id);
     }
 
