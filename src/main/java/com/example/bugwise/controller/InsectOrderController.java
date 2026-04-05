@@ -3,6 +3,7 @@ package com.example.bugwise.controller;
 import com.example.bugwise.dto.InsectOrderDTO;
 import com.example.bugwise.entity.InsectOrder;
 import com.example.bugwise.service.InsectOrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,13 @@ public class InsectOrderController {
     public ResponseEntity<InsectOrderDTO> getOrderById(@PathVariable Long id) {
     return ResponseEntity.ok(insectOrderService.findByIdInsectOrder(id));
     }
-    @PostMapping("/add")
-    public ResponseEntity<InsectOrderDTO> addOrder(@RequestBody InsectOrder insectOrder){
-    return ResponseEntity.status(HttpStatus.CREATED).body(insectOrderService.addInsectOrder(insectOrder));
+    @PostMapping
+    public ResponseEntity<InsectOrderDTO> addOrder(@Valid @RequestBody InsectOrderDTO dto){
+    return ResponseEntity.status(HttpStatus.CREATED).body(insectOrderService.addInsectOrder(dto));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<InsectOrderDTO> updateOrder(@PathVariable Long id,@RequestBody InsectOrder insectOrder){
-    return ResponseEntity.ok(insectOrderService.updateInsectOrder(id,insectOrder));
+    public ResponseEntity<InsectOrderDTO> updateOrder(@PathVariable Long id,@Valid @RequestBody InsectOrderDTO dto){
+    return ResponseEntity.ok(insectOrderService.updateInsectOrder(id,dto));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id){

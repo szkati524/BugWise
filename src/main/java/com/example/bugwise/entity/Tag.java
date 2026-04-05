@@ -19,6 +19,10 @@ public class Tag {
 
     }
 
+    public Tag(String tagName) {
+
+    }
+
     public Long getId() {
         return id;
     }

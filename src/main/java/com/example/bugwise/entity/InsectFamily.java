@@ -1,9 +1,6 @@
 package com.example.bugwise.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class InsectFamily {
@@ -11,7 +8,9 @@ public class InsectFamily {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String name;
+    @Column(unique = true, nullable = false)
     private String latinName;
 
     public InsectFamily(Long id, String name, String latinName) {

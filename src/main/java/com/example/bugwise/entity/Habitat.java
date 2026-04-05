@@ -8,10 +8,12 @@ public class Habitat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String name;
     private String type;
     @Column(columnDefinition = "TEXT")
     private String climateDescription;
+
 
     public Habitat(Long id, String name, String type, String climateDescription) {
         this.id = id;

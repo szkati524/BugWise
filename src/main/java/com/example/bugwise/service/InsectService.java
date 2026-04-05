@@ -1,82 +1,92 @@
 package com.example.bugwise.service;
 
 import com.example.bugwise.dto.InsectDTO;
+import com.example.bugwise.dto.TagDTO;
 import com.example.bugwise.entity.Insect;
-import com.example.bugwise.entity.InsectImage;
 import com.example.bugwise.entity.Tag;
-import com.example.bugwise.repository.InsectRepository;
+import com.example.bugwise.mapper.InsectMapper;
+import com.example.bugwise.repository.*;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class InsectService {
 
     private final InsectRepository insectRepository;
+    private final HabitatRepository habitatRepository;
+    private final InsectOrderRepository insectOrderRepository;
+    private final InsectFamilyRepository insectFamilyRepository;
+    private final TagRepository tagRepository;
+    private final InsectMapper insectMapper;
 
     @Autowired
-    public InsectService(InsectRepository insectRepository) {
+    public InsectService(InsectRepository insectRepository, HabitatRepository habitatRepository, InsectOrderRepository insectOrderRepository, InsectFamilyRepository insectFamilyRepository, TagRepository tagRepository, InsectMapper insectMapper) {
         this.insectRepository = insectRepository;
+        this.habitatRepository = habitatRepository;
+        this.insectOrderRepository = insectOrderRepository;
+        this.insectFamilyRepository = insectFamilyRepository;
+        this.tagRepository = tagRepository;
+        this.insectMapper = insectMapper;
     }
     @Transactional
-    public InsectDTO addInsect(Insect insect){
-       Insect savedInsect = insectRepository.save(insect);
-       return mapToDTO(savedInsect);
+    public InsectDTO addInsect(InsectDTO dto){
+       Insect insect = new Insect();
+       insectMapper.updateEntityFromDTO(dto,insect);
+
+       habitatRepository.findByName(dto.habitatName())
+               .stream().findFirst()
+                       .ifPresentOrElse(insect::setHabitat,
+                               () -> {throw new EntityNotFoundException("Habitat not found " + dto.habitatName());});
+       insectOrderRepository.findByName(dto.orderName())
+                       .ifPresent(insect::setInsectOrder);
+       insectFamilyRepository.findByName(dto.familyName())
+                       .ifPresent(insect::setInsectFamily);
+       if (dto.tags() != null) {
+           Set<Tag> insectTags = dto.tags().stream()
+                   .map(tagName -> tagRepository.findByName(tagName)
+                           .orElseGet(() -> tagRepository.save(new Tag(tagName))))
+                   .collect(Collectors.toSet());
+           insect.setTag(insectTags);
+       }
+
+       return insectMapper.toDTO(insectRepository.save(insect));
     }
+
     public List<InsectDTO> getAllInsects(){
-        return insectRepository.findAll().stream().map(this::mapToDTO).toList();
+       List<Insect> insects = insectRepository.findAllWithBasicInfo();
+       insects = insectRepository.fetchTags(insects);
+       return insects.stream()
+               .map(insectMapper::toDTO)
+               .toList();
     }
     public InsectDTO getInsectById(Long id){
-        return insectRepository.findById(id).map(this::mapToDTO).orElseThrow(() -> new EntityNotFoundException("Insect with id " + id + " not found"));
+        return insectRepository.findById(id).map(insectMapper::toDTO).orElseThrow(() -> new EntityNotFoundException("Insect with id " + id + " not found"));
 
     }
     @Transactional
-    public InsectDTO updateInsect(Long id,Insect insectDetails){
-Insect insect = insectRepository.findById(id)
+    public InsectDTO updateInsect(Long id,InsectDTO dto){
+return insectRepository.findById(id)
+        .map(existing -> {
+            insectMapper.updateEntityFromDTO(dto,existing);
+            return insectMapper.toDTO(insectRepository.save(existing));
+        })
         .orElseThrow(() -> new EntityNotFoundException("Insect with id " + id + " not found"));
-insect.setCommonName(insectDetails.getCommonName());
-insect.setLatinName(insectDetails.getLatinName());
-insect.setEnglishName(insectDetails.getEnglishName());
-insect.setDescription(insectDetails.getDescription());
-insect.setInsectOrder(insectDetails.getInsectOrder());
-insect.setInsectFamily(insectDetails.getInsectFamily());
-insect.setInsectImage(insectDetails.getInsectImage());
-insect.setHabitat(insectDetails.getHabitat());
-insect.setTag(insectDetails.getTag());
-insect.setDangerLevel(insectDetails.getDangerLevel());
-Insect updatedInsect = insectRepository.save(insect);
-return mapToDTO(updatedInsect);
+
     }
     @Transactional
     public void deleteInsect(Long id){
         if (!insectRepository.existsById(id)) {
-            throw new EntityNotFoundException("insect with id " + id + " not found");
+            throw new EntityNotFoundException("Insect with id " + id + " not found");
         }
         insectRepository.deleteById(id);
     }
-    private InsectDTO mapToDTO(Insect insect){
-        return  new InsectDTO(
-                insect.getId(),
-                insect.getCommonName(),
-                insect.getLatinName(),
-                insect.getEnglishName(),
-                insect.getDescription(),
-                insect.getInsectOrder() != null ? insect.getInsectOrder().getName() : "unknown",
-                insect.getInsectFamily() != null ? insect.getInsectFamily().getName() : "unknown",
-                insect.getHabitat() != null ? insect.getHabitat().getName() : "unknown",
-                insect.getInsectImage() != null ?
-                        insect.getInsectImage().stream().map(InsectImage::getUrl).toList() : List.of(),
-                insect.getTag() != null ?
-                        insect.getTag().stream().map(Tag::getName).toList() : List.of(),
-                insect.isProtected(),
-                insect.getDangerLevel() != null ? insect.getDangerLevel().name() : "unknown",
-                insect.getDangerLevel() != null ? insect.getDangerLevel().name() : null
-        );
+
     }
 
-}
+

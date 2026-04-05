@@ -5,6 +5,7 @@ import com.example.bugwise.entity.Insect;
 import com.example.bugwise.entity.InsectFamily;
 import com.example.bugwise.service.InsectFamilyService;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +30,12 @@ public class InsectFamilyController {
     return ResponseEntity.ok(insectFamilyService.findInsectFamilyById(id));
     }
     @PostMapping
-    public ResponseEntity<InsectFamilyDTO> addFamily(@RequestBody InsectFamily insectFamily){
-    return ResponseEntity.status(HttpStatus.CREATED).body(insectFamilyService.addInsectFamily(insectFamily));
+    public ResponseEntity<InsectFamilyDTO> addFamily(@Valid @RequestBody InsectFamilyDTO dto){
+    return ResponseEntity.status(HttpStatus.CREATED).body(insectFamilyService.addInsectFamily(dto));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<InsectFamilyDTO> updateFamily(@PathVariable Long id, @RequestBody InsectFamily insectFamily){
-    return ResponseEntity.ok(insectFamilyService.updateInsectFamily(id,insectFamily));
+    public ResponseEntity<InsectFamilyDTO> updateFamily(@PathVariable Long id,@Valid @RequestBody InsectFamilyDTO dto){
+    return ResponseEntity.ok(insectFamilyService.updateInsectFamily(id,dto));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFamily(@PathVariable Long id){

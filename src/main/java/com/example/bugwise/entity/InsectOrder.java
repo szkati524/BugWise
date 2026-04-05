@@ -8,7 +8,9 @@ public class InsectOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String name;
+    @Column(unique = true, nullable = false)
     private String latinName;
     @Column(columnDefinition = "TEXT")
     private String description;

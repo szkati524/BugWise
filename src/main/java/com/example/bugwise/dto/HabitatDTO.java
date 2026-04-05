@@ -1,7 +1,11 @@
 package com.example.bugwise.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.NonNull;
+
 public record HabitatDTO(Long id,
-                         String name,
-                         String type,
+                         @NotBlank(message = "Name cannot be blank")     String name,
+                         @NotNull String type,
                          String climateDescription) {
 }

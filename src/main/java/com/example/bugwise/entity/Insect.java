@@ -3,16 +3,20 @@ package com.example.bugwise.entity;
 import com.example.bugwise.enums.DangerLevel;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Insect {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(unique = true, nullable = false)
    private String commonName;
+    @Column(unique = true)
    private String latinName;
+    @Column(unique = true)
    private String englishName;
    @ManyToOne
    @JoinColumn(name = "order_id")
@@ -33,12 +37,12 @@ public class Insect {
    joinColumns= @JoinColumn(name = "insect_id"),
    inverseJoinColumns = @JoinColumn(name = "tag_id")
    )
-    private List<Tag> tag;
+    private Set<Tag> tag = new HashSet<>();
     private boolean isProtected;
     @Enumerated(EnumType.STRING)
     private DangerLevel dangerLevel;
 
-    public Insect(Long id, String commonName, String latinName, String englishName, InsectOrder insectOrder, InsectFamily insectFamily, String description, Habitat habitat, List<InsectImage> insectImage, List<Tag> tag, boolean isProtected, DangerLevel dangerLevel) {
+    public Insect(Long id, String commonName, String latinName, String englishName, InsectOrder insectOrder, InsectFamily insectFamily, String description, Habitat habitat, List<InsectImage> insectImage, Set<Tag> tag, boolean isProtected, DangerLevel dangerLevel) {
         this.id = id;
         this.commonName = commonName;
         this.latinName = latinName;
@@ -128,11 +132,11 @@ public class Insect {
         this.insectImage = insectImage;
     }
 
-    public List<Tag> getTag() {
+    public Set<Tag> getTag() {
         return tag;
     }
 
-    public void setTag(List<Tag> tag) {
+    public void setTag(Set<Tag> tag) {
         this.tag = tag;
     }
 

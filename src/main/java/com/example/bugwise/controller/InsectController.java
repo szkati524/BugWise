@@ -3,6 +3,7 @@ package com.example.bugwise.controller;
 import com.example.bugwise.dto.InsectDTO;
 import com.example.bugwise.entity.Insect;
 import com.example.bugwise.service.InsectService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,12 @@ public class InsectController {
         return ResponseEntity.ok(insectService.getInsectById(id));
     }
     @PostMapping
-    public ResponseEntity<InsectDTO> create(@RequestBody Insect insect){
-        return ResponseEntity.status(HttpStatus.CREATED).body(insectService.addInsect(insect));
+    public ResponseEntity<InsectDTO> create(@Valid @RequestBody InsectDTO dto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(insectService.addInsect(dto));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<InsectDTO> update(@PathVariable Long id, @RequestBody Insect insect ){
-        return ResponseEntity.ok(insectService.updateInsect(id,insect));
+    public ResponseEntity<InsectDTO> update(@PathVariable Long id,@Valid @RequestBody InsectDTO dto ){
+        return ResponseEntity.ok(insectService.updateInsect(id,dto));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
